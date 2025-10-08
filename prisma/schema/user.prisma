@@ -9,8 +9,8 @@ model User {
   updated            DateTime   @updatedAt
 
   admin   Admin?
-  Doctor  Doctor?
-  Patient Patient?
+  doctor  Doctor?
+  patient Patient?
 
   @@map("users")
 }
@@ -20,7 +20,7 @@ model Admin {
   name          String
   email         String  @unique
   profilePhoto  String?
-  contactNumber String
+  contactNumber String?
   isDeleted     Boolean @default(false)
 
   createdAt DateTime @default(now())
