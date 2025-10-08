@@ -56,6 +56,19 @@ model Doctor {
   @@map("doctors")
 }
 
+model Patient {
+  id            String  @id @default(uuid())
+  name          String
+  email         String  @unique
+  profilePhoto  String?
+  contactNumber String
+  address       String
+  isDeleted     Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updated   DateTime @updatedAt
+}
+
 enum UserRole {
   PATIENT
   DOCTOR
