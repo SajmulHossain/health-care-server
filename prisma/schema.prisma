@@ -24,7 +24,7 @@ model Admin {
   id            String  @id @default(uuid())
   name          String
   email         String  @unique
-  profilePhoto  String
+  profilePhoto  String?
   contactNumber String
   isDeleted     Boolean @default(false)
 
@@ -32,6 +32,28 @@ model Admin {
   updated   DateTime @updatedAt
 
   @@map("admins")
+}
+
+model Doctor {
+  id                  String  @id @default(uuid())
+  name                String
+  email               String  @unique
+  profilePhoto        String?
+  contactNumber       String
+  address             String
+  registrationNumber  String
+  experience          Int     @default(0)
+  gender              Gender
+  appointmentFee      Int
+  qualification       String
+  currentWorkingPlace String
+  designation         String
+  isDeleted           Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updated   DateTime @updatedAt
+
+  @@map("doctors")
 }
 
 enum UserRole {
@@ -44,4 +66,9 @@ enum UserStatus {
   ACTIVE
   INACTIVE
   DELETED
+}
+
+enum Gender {
+  MALE
+  FEMALE
 }
