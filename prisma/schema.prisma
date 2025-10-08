@@ -8,5 +8,40 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
+  id                 String     @id @default(uuid())
+  email              String     @unique
+  password           String
+  role               UserRole   @default(PATIENT)
+  needPasswordChange Boolean    @default(true)
+  status             UserStatus @default(ACTIVE)
+  createdAt          DateTime   @default(now())
+  updated            DateTime   @updatedAt
+
+  @@map("users")
+}
+
+model Admin {
+  id            String  @id @default(uuid())
+  name          String
+  email         String  @unique
+  profilePhoto  String
+  contactNumber String
+  isDeleted     Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updated   DateTime @updatedAt
+
+  @@map("admins")
+}
+
+enum UserRole {
+  PATIENT
+  DOCTOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  DELETED
 }
