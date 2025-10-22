@@ -6,28 +6,25 @@ import { fileUploader } from "../../utils/fileUploader";
 const createPatient = async (req: Request) => {
   if(req.file) {
     const uploadedData = await fileUploader.uploadToCloudinary(req.file);
-    console.log(uploadedData);
+    req.body.patient.profilePhoto = uploadedData?.secure_url;
   }
-  
-  // req.body.password = await hash(req.body.password, 10);
 
-  // const result = await prisma.$transaction(async (tnx) => {
-  //   await tnx.user.create({
-  //     data: {
-  //       email: req.body.email,
-  //       password: req.body.password,
-  //     },
-  //   });
+  req.body.password = await hash(req.body.password, 10);
 
-  //   return await tnx.patient.create({
-  //     data: {
-  //       name: req.body.name,
-  //       email: req.body.email,
-  //     },
-  //   });
-  // });
+  const result = await prisma.$transaction(async (tnx) => {
+    await tnx.user.create({
+      data: {
+        email: req.body.patient.email,
+        password: req.body.password,
+      },
+    });
 
-  // return result;
+    return await tnx.patient.create({
+      data: req.body.patient
+    });
+  });
+
+  return result;
 };
 
 export const UserServices = {

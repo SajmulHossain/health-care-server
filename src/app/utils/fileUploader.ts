@@ -17,7 +17,7 @@ const upload = multer({ storage: storage });
 
 const uploadToCloudinary = async (file: Express.Multer.File) => {
   cloudinary.config({
-    cloud_name: "PH DOCTOR",
+    cloud_name: config.cloudinary.cloudinary_cloud_name,
     api_key: config.cloudinary.cloudinary_api_key,
     api_secret: config.cloudinary.cloudinary_api_secret,
   });
