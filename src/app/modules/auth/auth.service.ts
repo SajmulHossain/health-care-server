@@ -1,6 +1,7 @@
-import { UserStatus } from "@prisma/client"
-import { prisma } from "../../shared/prisma"
-import { compare } from "bcryptjs"
+import { UserStatus } from "@prisma/client";
+import { compare } from "bcryptjs";
+import { prisma } from "../../shared/prisma";
+import { token } from "../../utils/jwt";
 
 const login = async(payload: {email: string, password: string}) => {
     const user = await prisma.user.findUniqueOrThrow({
@@ -16,7 +17,12 @@ const login = async(payload: {email: string, password: string}) => {
         throw new Error("Password Didn't matched");
     }
 
-    
+    const accessToken = token.createToken({email: user.email, role: user.role}, 'abcd', '1h')
+    const refreshToken = token.createToken({email: user.email, role: user.role}, 'abcd', '2d');
+
+    return {
+        accessToken, refreshToken, needPasswordChange: user.needPasswordChange
+    }
 }
 
 export const AuthServices = {
