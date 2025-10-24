@@ -2,9 +2,11 @@ import { hash } from "bcryptjs";
 import { Request } from "express";
 import { prisma } from "../../shared/prisma";
 import { fileUploader } from "../../utils/fileUploader";
+import pick from "../../utils/pick";
+import getPaginationInfo from "../../utils/pagination&sorting";
 
 const createPatient = async (req: Request) => {
-  if(req.file) {
+  if (req.file) {
     const uploadedData = await fileUploader.uploadToCloudinary(req.file);
     req.body.patient.profilePhoto = uploadedData?.secure_url;
   }
@@ -20,36 +22,34 @@ const createPatient = async (req: Request) => {
     });
 
     return await tnx.patient.create({
-      data: req.body.patient
+      data: req.body.patient,
     });
   });
 
   return result;
 };
 
-const getAllUsers = async(query: Record<string, string>) => {
-  const page = Number(query.page || 1)
-  const limit = Number(query.limit || 10);
-  const search = query.search || '';
-  const sortBy = query.sortBy || 'email'
-  const sortOrder = query.sortOrder || 'desc'
+const getAllUsers = async (query: Record<string, string>) => {
+  const search = query.search || "";
+  const options = pick(query, ["page", "limit", "sortBy", "sortOrder"]);
+  const { limit, page, sortBy, sortOrder } = getPaginationInfo(options);
 
   return await prisma.user.findMany({
     skip: (page - 1) * limit,
     take: limit,
     orderBy: {
-      [sortBy]: sortOrder
+      [sortBy]: sortOrder,
     },
     where: {
       email: {
         contains: search,
-        mode: "insensitive"
-      }
-    }
+        mode: "insensitive",
+      },
+    },
   });
-}
+};
 
 export const UserServices = {
   createPatient,
-  getAllUsers
+  getAllUsers,
 };
