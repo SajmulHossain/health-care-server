@@ -29,11 +29,23 @@ const createPatient = async (req: Request) => {
 
 const getAllUsers = async(query: Record<string, string>) => {
   const page = Number(query.page || 1)
-  const limit = Number(query.limit || 10)
+  const limit = Number(query.limit || 10);
+  const search = query.search || '';
+  const sortBy = query.sortBy || 'email'
+  const sortOrder = query.sortOrder || 'desc'
 
   return await prisma.user.findMany({
     skip: (page - 1) * limit,
-    take: limit
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder
+    },
+    where: {
+      email: {
+        contains: search,
+        mode: "insensitive"
+      }
+    }
   });
 }
 
