@@ -13,6 +13,19 @@ const createPatient = catchAsync(async (req, res) => {
   });
 });
 
+const getAllUsers = catchAsync(async (req, res) => {
+  const data = await UserServices.getAllUsers(
+    req.query as Record<string, string>
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    data,
+    message: "Data retrived successfully",
+  });
+});
+
 export const UserControllers = {
   createPatient,
+  getAllUsers
 };
