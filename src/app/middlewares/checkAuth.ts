@@ -17,7 +17,6 @@ const checkAuth = (...roles: string[]) => {
       const verifiedUser = token.verifyToken(accessToken);
 
       req.user = verifiedUser;
-      console.log(roles.includes(verifiedUser.role));
 
       if (roles.length && !roles.includes(verifiedUser.role)) {
         throw new Error("Your are not permitted");
