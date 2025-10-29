@@ -3,8 +3,8 @@ import { token } from "../utils/jwt";
 
 const checkAuth = (...roles: string[]) => {
   return async (
-    req: Request & { user?: any },
-    res: Response,
+    req: Request,
+    _res: Response,
     next: NextFunction
   ) => {
     try {
