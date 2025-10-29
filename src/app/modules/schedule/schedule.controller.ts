@@ -2,6 +2,17 @@ import catchAsync from "../../shared/catchAsync";
 import sendResponse from "../../shared/sendResponse";
 import { ScheduleServices } from "./schedule.service";
 
+const getScheduleForDoctors = catchAsync(async (req, res) => {
+  const {result:data, meta} = await ScheduleServices.getScheduleForDoctors(req.query as Record<string, string>);
+
+  sendResponse(res, {
+    data,
+    message: "Schedule Created",
+    statusCode: 201,
+    meta
+  });
+});
+
 const createSchedule = catchAsync(async (req, res) => {
   const data = await ScheduleServices.createSchedule(req.body);
 
@@ -13,5 +24,5 @@ const createSchedule = catchAsync(async (req, res) => {
 });
 
 export const ScheduleControllers = {
-  createSchedule,
+  createSchedule,getScheduleForDoctors
 };
