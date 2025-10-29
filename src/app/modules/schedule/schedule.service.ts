@@ -3,8 +3,12 @@ import { prisma } from "../../shared/prisma";
 import pick from "../../utils/pick";
 import getPaginationInfo from "../../utils/pagination&sorting";
 import { Prisma } from "@prisma/client";
+import { Request } from "express";
 
-const getScheduleForDoctors = async (query: Record<string, string>) => {
+const getScheduleForDoctors = async (
+  query: Record<string, string>,
+  user: Request["user"]
+) => {
   const options = pick(query, ["page", "limit", "sortBy", "sortOrder"]);
   const filters = pick(query, ["startDateTime", "endDateTime"]);
 
@@ -34,8 +38,28 @@ const getScheduleForDoctors = async (query: Record<string, string>) => {
       }
     : {};
 
+  const doctorSchedules = await prisma.doctorSchedule.findMany({
+    where: {
+      doctor: {
+        email: user.email,
+      },
+    },
+    select: {
+      scheduleId: true,
+    },
+  });
+
+  const doctorScheduleIds = doctorSchedules.map(
+    (schedules) => schedules.scheduleId
+  );
+
   const result = await prisma.schedule.findMany({
-    where: whereConditions,
+    where: {
+      ...whereConditions,
+      id: {
+        notIn: doctorScheduleIds,
+      },
+    },
     skip: (page - 1) * limit,
     take: limit,
 
@@ -45,15 +69,22 @@ const getScheduleForDoctors = async (query: Record<string, string>) => {
   });
 
   const total = await prisma.schedule.count({
-    where: whereConditions
-  })
+    where: {
+      ...whereConditions,
+      id: {
+        notIn: doctorScheduleIds,
+      },
+    },
+  });
 
   return {
     result,
     meta: {
-      page, limit, total
-    }
-  }
+      page,
+      limit,
+      total,
+    },
+  };
 };
 
 const createSchedule = async (payload: any) => {
@@ -121,16 +152,16 @@ const createSchedule = async (payload: any) => {
   return schedules;
 };
 
-const deleteSchedule = async(id: string) => {
+const deleteSchedule = async (id: string) => {
   return prisma.schedule.delete({
     where: {
-      id
-    }
-  })
-}
+      id,
+    },
+  });
+};
 
 export const ScheduleServices = {
   createSchedule,
   getScheduleForDoctors,
-  deleteSchedule
+  deleteSchedule,
 };

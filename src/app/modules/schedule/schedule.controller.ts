@@ -4,7 +4,7 @@ import { ScheduleServices } from "./schedule.service";
 
 const getScheduleForDoctors = catchAsync(async (req, res) => {
   const { result: data, meta } = await ScheduleServices.getScheduleForDoctors(
-    req.query as Record<string, string>
+    req.query as Record<string, string>, req.user
   );
 
   sendResponse(res, {
