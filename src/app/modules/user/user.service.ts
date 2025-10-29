@@ -4,6 +4,8 @@ import { prisma } from "../../shared/prisma";
 import { fileUploader } from "../../utils/fileUploader";
 import pick from "../../utils/pick";
 import getPaginationInfo from "../../utils/pagination&sorting";
+import { Prisma } from "@prisma/client";
+import { userFilterableFields, userSearchableField } from "./user.constant";
 
 const createPatient = async (req: Request) => {
   if (req.file) {
@@ -30,23 +32,56 @@ const createPatient = async (req: Request) => {
 };
 
 const getAllUsers = async (query: Record<string, string>) => {
-  const search = query.search || "";
   const options = pick(query, ["page", "limit", "sortBy", "sortOrder"]);
   const { limit, page, sortBy, sortOrder } = getPaginationInfo(options);
 
-  return await prisma.user.findMany({
+  const { search, ...filterData } = pick(query, userFilterableFields);
+
+  const andConditions: Prisma.UserWhereInput[] = [];
+
+  if (search) {
+    andConditions.push({
+      OR: userSearchableField.map((field) => ({
+        [field]: { contains: search, mode: "insensitive" },
+      })),
+    });
+  }
+
+  if (Object.keys(filterData).length) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: filterData[key],
+        },
+      })),
+    });
+  }
+
+  const result = await prisma.user.findMany({
     skip: (page - 1) * limit,
     take: limit,
     orderBy: {
       [sortBy]: sortOrder,
     },
     where: {
-      email: {
-        contains: search,
-        mode: "insensitive",
-      },
+      AND: andConditions,
     },
   });
+
+  const total = await prisma.user.count({
+    where: {
+      AND: andConditions,
+    },
+  });
+
+  return {
+    data: result,
+    meta: {
+      page,
+      limit,
+      total,
+    },
+  };
 };
 
 export const UserServices = {

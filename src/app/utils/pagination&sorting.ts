@@ -15,7 +15,7 @@ type TReturn = {
 const getPaginationInfo = (options: TOptions): TReturn => {
   const page = Number(options.page || 1);
   const limit = Number(options.limit || 10);
-  const sortBy = options.sortBy || "email";
+  const sortBy = options.sortBy || "createdAt";
   const sortOrder = options.sortOrder || "desc";
 
   return {
