@@ -1,21 +1,25 @@
 import { NextFunction, Request, Response } from "express";
 import { token } from "../utils/jwt";
 
-const checkAuth =
-  (...roles: string[]) =>
-  async (req: Request & { user: any }, res: Response, next: NextFunction) => {
+const checkAuth = (...roles: string[]) => {
+  return async (
+    req: Request & { user?: any },
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      const token = req.cookies.get("accessToken");
+      const accessToken = req.cookies?.accessToken;
 
-      if (!token) {
+      if (!accessToken) {
         throw new Error("You are not authorized");
       }
 
-      const verifiedUser = token.verifyToken(token);
+      const verifiedUser = token.verifyToken(accessToken);
 
       req.user = verifiedUser;
+      console.log(roles.includes(verifiedUser.role));
 
-      if (roles.length && roles.includes(verifiedUser.role)) {
+      if (roles.length && !roles.includes(verifiedUser.role)) {
         throw new Error("Your are not permitted");
       }
 
@@ -24,3 +28,6 @@ const checkAuth =
       next(error);
     }
   };
+};
+
+export default checkAuth;

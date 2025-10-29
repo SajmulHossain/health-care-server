@@ -2,10 +2,12 @@ import { NextFunction, Request, Response, Router } from "express";
 import { UserControllers } from "./user.controller";
 import { fileUploader } from "../../utils/fileUploader";
 import { UserValidation } from "./user.validation";
+import checkAuth from "../../middlewares/checkAuth";
+import { UserRole } from "@prisma/client";
 
 const router = Router();
 
-router.get("/", UserControllers.getAllUsers);
+router.get("/", checkAuth(UserRole.ADMIN), UserControllers.getAllUsers);
 router.post(
   "/create-patient",
   fileUploader.upload.single("file"),

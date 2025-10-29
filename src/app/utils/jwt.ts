@@ -9,7 +9,7 @@ const createToken = (payload: JwtPayload, key: Secret, expiresIn: string) => {
 };
 
 const verifyToken = (token: string) => {
-  jwt.verify(token, "abcd") as JwtPayload;
+ return jwt.verify(token, "abcd") as JwtPayload;
 };
 
 export const token = {
