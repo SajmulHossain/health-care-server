@@ -1,5 +1,6 @@
 import { UserStatus } from "@prisma/client";
 import { compare } from "bcryptjs";
+import ApiError from "../../shared/ApiError";
 import { prisma } from "../../shared/prisma";
 import { token } from "../../utils/jwt";
 
@@ -14,7 +15,7 @@ const login = async(payload: {email: string, password: string}) => {
     const isPasswordMatched = await compare(payload.password, user.password)
 
     if(!isPasswordMatched) {
-        throw new Error("Password Didn't matched");
+        throw new ApiError(400 ,"Password Didn't matched");
     }
 
     const accessToken = token.createToken({email: user.email, role: user.role}, 'abcd', '1h')
