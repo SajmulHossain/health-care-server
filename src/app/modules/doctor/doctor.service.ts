@@ -1,5 +1,5 @@
 import { userFilterableFields } from "./../user/user.constant";
-import { Prisma } from "@prisma/client";
+import { Doctor, Prisma } from "@prisma/client";
 import getPaginationInfo from "../../utils/pagination&sorting";
 import pick from "../../utils/pick";
 import { DoctorConstants } from "./doctor.constant";
@@ -43,7 +43,7 @@ const getAllDoctors = async (query: Record<string, string>) => {
     skip: (page - 1) * limit,
     take: limit,
     orderBy: {
-      [sortBy]: sortOrder
+      [sortBy]: sortOrder,
     },
   });
 
@@ -61,6 +61,24 @@ const getAllDoctors = async (query: Record<string, string>) => {
   };
 };
 
+const updateDoctor = async (id: string, payload: Partial<Doctor>) => {
+  const doctorInfo = await prisma.doctor.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  const data = await prisma.doctor.update({
+    where: {
+      id,
+    },
+    data: payload,
+  });
+
+  return data;
+};
+
 export const DoctorServices = {
   getAllDoctors,
+  updateDoctor,
 };
