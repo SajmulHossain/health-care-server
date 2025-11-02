@@ -14,3 +14,7 @@ const getAllDoctors = catchAsync(async (req, res) => {
     statusCode: 200,
   });
 });
+
+export const DoctorControllers = {
+  getAllDoctors
+}

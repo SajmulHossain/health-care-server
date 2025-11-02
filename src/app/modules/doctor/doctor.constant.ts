@@ -8,7 +8,7 @@ const filters = [
   "search",
 ];
 
-const search = ["name", "email", "contactNumber", "specialities"];
+const search = ["name", "email", "contactNumber"];
 
 export const DoctorConstants = {
   options,

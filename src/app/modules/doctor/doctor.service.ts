@@ -14,12 +14,14 @@ const getAllDoctors = async (query: Record<string, string>) => {
   const andConditions: Prisma.DoctorWhereInput[] = [];
 
   if (search) {
-    OR: DoctorConstants.search.map((field) => ({
-      [field]: {
-        contains: search,
-        mode: "insensitive",
-      },
-    }));
+    andConditions.push({
+      OR: DoctorConstants.search.map((field) => ({
+        [field]: {
+          contains: search,
+          mode: "insensitive",
+        },
+      })),
+    });
   }
 
   if (Object.keys(filters).length) {
@@ -41,8 +43,7 @@ const getAllDoctors = async (query: Record<string, string>) => {
     skip: (page - 1) * limit,
     take: limit,
     orderBy: {
-      [sortBy]: sortBy,
-      [sortOrder]: sortOrder,
+      [sortBy]: sortOrder
     },
   });
 
