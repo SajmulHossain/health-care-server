@@ -12,4 +12,5 @@ export default {
     cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET,
     cloudinary_cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   },
+  open_router_api_key: process.env.OPEN_ROUTER_API_KEY,
 };

@@ -1,9 +1,10 @@
-import { userFilterableFields } from "./../user/user.constant";
 import { Doctor, Prisma } from "@prisma/client";
+import { prisma } from "../../shared/prisma";
 import getPaginationInfo from "../../utils/pagination&sorting";
 import pick from "../../utils/pick";
 import { DoctorConstants } from "./doctor.constant";
-import { prisma } from "../../shared/prisma";
+import ApiError from "../../shared/ApiError";
+import { openai } from "../../config/open-router";
 
 const getAllDoctors = async (query: Record<string, string>) => {
   const options = pick(query, DoctorConstants.options);
@@ -62,7 +63,7 @@ const getAllDoctors = async (query: Record<string, string>) => {
 };
 
 const updateDoctor = async (id: string, payload: Partial<Doctor>) => {
-  const doctorInfo = await prisma.doctor.findUniqueOrThrow({
+  await prisma.doctor.findUniqueOrThrow({
     where: {
       id,
     },
@@ -78,7 +79,55 @@ const updateDoctor = async (id: string, payload: Partial<Doctor>) => {
   return data;
 };
 
+const getAISuggestions = async ({ symptoms }: { symptoms: string[] }) => {
+  if (!(symptoms && symptoms.length)) {
+    throw new ApiError(400, "No symptoms found");
+  }
+
+  const doctors = await prisma.doctor.findMany({
+    where: {
+      isDeleted: false,
+    },
+    include: {
+      doctorSpecialties: {
+        include: {
+          specialities: true,
+        },
+      },
+    },
+  });
+
+  const prompt = `You are a medical assistant AI. Based on the patient's symtomps, suggest the top 3 most successfull doctor. Each doctor  has specialities and years of experience.
+  Only suggest doctors who are relavant to given symptoms
+
+  Symptoms: ${symptoms.join(", ")}
+
+  Here the doctor list in JSON format: ${JSON.stringify(doctors, null, 2)}
+  
+  Return your response in JSON format with full indivisual doctor data
+  
+  `;
+
+  const completion = await openai.chat.completions.create({
+    model: "z-ai/glm-4.5-air:free`",
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are a helpful AI medical assistant that provides doctor suggesstion",
+      },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+  });
+
+  return doctors;
+};
+
 export const DoctorServices = {
   getAllDoctors,
   updateDoctor,
+  getAISuggestions,
 };
