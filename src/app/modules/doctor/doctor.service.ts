@@ -109,7 +109,7 @@ const getAISuggestions = async ({ symptoms }: { symptoms: string[] }) => {
   `;
 
   const completion = await openai.chat.completions.create({
-    model: "z-ai/glm-4.5-air:free`",
+    model: "z-ai/glm-4.5-air:free",
     messages: [
       {
         role: "system",
@@ -122,6 +122,8 @@ const getAISuggestions = async ({ symptoms }: { symptoms: string[] }) => {
       },
     ],
   });
+
+  console.log(completion.choices[0].message.content);
 
   return doctors;
 };
