@@ -5,6 +5,7 @@ import pick from "../../utils/pick";
 import { DoctorConstants } from "./doctor.constant";
 import ApiError from "../../shared/ApiError";
 import { openai } from "../../config/open-router";
+import { extractJsonFromMessage } from "../../utils/extractJsonFromMessage";
 
 const getAllDoctors = async (query: Record<string, string>) => {
   const options = pick(query, DoctorConstants.options);
@@ -124,6 +125,7 @@ const getAISuggestions = async ({ symptoms }: { symptoms: string[] }) => {
   });
 
   console.log(completion.choices[0].message.content);
+  const result = await extractJsonFromMessage(completion.choices[0].message.content);
 
   return doctors;
 };
