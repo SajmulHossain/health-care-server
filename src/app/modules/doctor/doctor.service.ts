@@ -127,7 +127,7 @@ const getAISuggestions = async ({ symptoms }: { symptoms: string[] }) => {
   console.log(completion.choices[0].message.content);
   const result = await extractJsonFromMessage(completion.choices[0].message.content);
 
-  return doctors;
+  return result;
 };
 
 export const DoctorServices = {
