@@ -47,6 +47,8 @@ model Doctor {
   designation         String
   isDeleted           Boolean @default(false)
 
+  appointments Appointment[]
+
   createdAt DateTime @default(now())
   updated   DateTime @updatedAt
 
@@ -69,7 +71,8 @@ model Patient {
   createdAt DateTime @default(now())
   updated   DateTime @updatedAt
 
-  user User @relation(fields: [email], references: [email])
+  user         User          @relation(fields: [email], references: [email])
+  appointments Appointment[]
 
   @@map("patients")
 }
