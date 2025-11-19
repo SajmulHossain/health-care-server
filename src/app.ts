@@ -6,8 +6,16 @@ import config from "./app/config";
 import { uptime } from "process";
 import router from "./app/routes";
 import cookieParser from 'cookie-parser';
+import { PaymentController } from "./app/modules/payment/payment.controller";
 
 const app: Application = express();
+
+app.post(
+  "/api/v1/payment/webhook",
+  express.raw({ type: "application/json" }), // important for signature verification
+  PaymentController.handleStripeWebhookEvent
+);
+
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -22,7 +30,7 @@ app.use(cookieParser());
 
 app.use("/api/v1", router);
 
-app.get("/", (req: Request, res: Response) => {
+app.get("/", (_req: Request, res: Response) => {
   res.send({
     message: "Server is running..",
     environment: config.node_env,

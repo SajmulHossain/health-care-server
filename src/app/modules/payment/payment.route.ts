@@ -1,6 +1,5 @@
-import { Router } from "express";
+// import { Router } from "express";
 
-const router = Router();
+// const router = Router();
 
-
-export const PaymentRoutes = router;
+// export const PaymentRoutes = router;
