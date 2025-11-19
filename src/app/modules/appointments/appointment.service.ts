@@ -58,7 +58,7 @@ const createAppointment = async (
 
     const transactionId = uuidv4();
 
-    await tnx.payment.create({
+    const paymentData = await tnx.payment.create({
       data: {
         appointmentId: appointmentData.id,
         amount: doctorData.appointmentFee,
@@ -78,16 +78,18 @@ const createAppointment = async (
             },
             unit_amount: doctorData.appointmentFee * 100,
           },
-          quantity: 1
+          quantity: 1,
         },
       ],
+      metadata: {
+        appointmentId: appointmentData.id,
+        paymentId: paymentData.id,
+      },
       success_url: `${"https://sajmul-portfolio.vercel.app"}/dashboard`,
-      cancel_url: "https://sajmul.com"
+      cancel_url: "https://sajmul.com",
     });
 
-    console.log(session);
-
-    return appointmentData;
+    return { paymentUrl: session.url };
   });
 
   return result;
