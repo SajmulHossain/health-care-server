@@ -11,8 +11,8 @@ import { PaymentController } from "./app/modules/payment/payment.controller";
 const app: Application = express();
 
 app.post(
-  "/api/v1/payment/webhook",
-  express.raw({ type: "application/json" }), // important for signature verification
+  "/webhook",
+  express.raw({ type: "application/json" }),
   PaymentController.handleStripeWebhookEvent
 );
 
@@ -30,7 +30,7 @@ app.use(cookieParser());
 
 app.use("/api/v1", router);
 
-app.get("/", (_req: Request, res: Response) => {
+app.get("/", (req: Request, res: Response) => {
   res.send({
     message: "Server is running..",
     environment: config.node_env,
