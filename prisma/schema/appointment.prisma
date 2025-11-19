@@ -4,8 +4,8 @@ model Appointment {
     doctorId       String
     scheduleId     String
     videoCallingId String
-    status         AppointmentStatus
-    paymentStatus  PaymentStatus
+    status         AppointmentStatus @default(SCHEDULED)
+    paymentStatus  PaymentStatus     @default(UNPAID)
     patient        Patient           @relation(fields: [patientId], references: [id])
     doctor         Doctor            @relation(fields: [doctorId], references: [id])
     schedule       Schedule          @relation(fields: [scheduleId], references: [id])

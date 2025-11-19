@@ -15,6 +15,17 @@ const getAllDoctors = catchAsync(async (req, res) => {
   });
 });
 
+const getSingleDoctor = catchAsync(async (req, res) => {
+  const {id} = req.params;
+  const data = await DoctorServices.getSingleDoctor(id as string);
+
+  sendResponse(res, {
+    data,
+    message: "Data retrived successfully",
+    statusCode: 200,
+  });
+});
+
 const updateDoctor = catchAsync(async (req, res) => {
   const { id } = req.params;
   const data = await DoctorServices.updateDoctor(id, req.body);
@@ -39,5 +50,6 @@ const getAISuggestions = catchAsync(async (req, res) => {
 export const DoctorControllers = {
   getAllDoctors,
   updateDoctor,
-  getAISuggestions
+  getAISuggestions,
+  getSingleDoctor
 };

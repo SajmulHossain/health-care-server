@@ -63,6 +63,33 @@ const getAllDoctors = async (query: Record<string, string>) => {
   };
 };
 
+const getSingleDoctor = async (id: string) => {
+  const data = await prisma.doctor.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+    // include: {
+    //   doctorSchedules: true,
+    //   doctorSpecialties: true,
+    // },
+    include: {
+      doctorSchedules: {
+        include: {
+          schedule: true,
+        },
+      },
+      doctorSpecialties: {
+        include: {
+          specialities: true,
+        },
+      },
+    },
+  });
+
+  return data;
+};
+
 const updateDoctor = async (id: string, payload: Partial<Doctor>) => {
   await prisma.doctor.findUniqueOrThrow({
     where: {
@@ -125,7 +152,9 @@ const getAISuggestions = async ({ symptoms }: { symptoms: string[] }) => {
   });
 
   console.log(completion.choices[0].message.content);
-  const result = await extractJsonFromMessage(completion.choices[0].message.content);
+  const result = await extractJsonFromMessage(
+    completion.choices[0].message.content
+  );
 
   return result;
 };
@@ -134,4 +163,5 @@ export const DoctorServices = {
   getAllDoctors,
   updateDoctor,
   getAISuggestions,
+  getSingleDoctor,
 };
