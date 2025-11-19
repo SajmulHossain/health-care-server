@@ -1,5 +1,6 @@
 import { prisma } from "../../shared/prisma";
 import { v4 as uuidv4 } from "uuid";
+import { stripe } from "../../utils/stripe";
 
 const createAppointment = async (
   email: string,
@@ -64,6 +65,27 @@ const createAppointment = async (
         transactionId,
       },
     });
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: `Appointment with ${doctorData.name}`,
+            },
+            unit_amount: doctorData.appointmentFee * 100,
+          },
+          quantity: 1
+        },
+      ],
+      success_url: `${"https://sajmul-portfolio.vercel.app"}/dashboard`,
+      cancel_url: "https://sajmul.com"
+    });
+
+    console.log(session);
 
     return appointmentData;
   });
