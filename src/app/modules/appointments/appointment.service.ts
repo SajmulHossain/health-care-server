@@ -1,6 +1,10 @@
 import { prisma } from "../../shared/prisma";
 import { v4 as uuidv4 } from "uuid";
 import { stripe } from "../../utils/stripe";
+import ApiError from "../../shared/ApiError";
+import pick from "../../utils/pick";
+import getPaginationInfo from "../../utils/pagination&sorting";
+import { Prisma, UserRole } from "@prisma/client";
 
 const createAppointment = async (
   email: string,
@@ -29,6 +33,10 @@ const createAppointment = async (
       isBooked: false,
     },
   });
+
+  if (!isBooked) {
+    throw new ApiError(400, "The slot already booked");
+  }
 
   const videoCallingId = uuidv4();
 
@@ -95,6 +103,78 @@ const createAppointment = async (
   return result;
 };
 
+const getMyAppointment = async (
+  email: string,
+  role: string,
+  query: Record<string, string>
+) => {
+  const options = pick(query, ["page", "limit", "sortBy", "sortOrder"]);
+  const filters = pick(query, ["status", "paymentStatus"]);
+  console.log(filters);
+
+  const { limit: take, page, sortBy, sortOrder } = getPaginationInfo(options);
+
+  const andConditions: Prisma.AppointmentWhereInput[] = [];
+
+  if (role === UserRole.PATIENT) {
+    andConditions.push({
+      patient: {
+        email,
+      },
+    });
+  } else if (role === UserRole.DOCTOR) {
+    andConditions.push({
+      doctor: {
+        email,
+      },
+    });
+  }
+
+  if (Object.keys(filters).length > 0) {
+    const filterConditions = Object.keys(filters).map((key) => ({
+      [key]: {
+        equals: filters[key],
+      },
+    }));
+
+    andConditions.push(...filterConditions);
+  }
+
+  const whereConditions: Prisma.AppointmentWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const data = await prisma.appointment.findMany({
+    where: whereConditions,
+    skip: take * (page - 1),
+    take,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    include:
+      role === UserRole.PATIENT
+        ? {
+            doctor: true,
+          }
+        : {
+            patient: true,
+          },
+  });
+
+  const total = await prisma.appointment.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      total,
+      page,
+      limit: take,
+    },
+    data,
+  };
+};
+
 export const AppointmentService = {
   createAppointment,
+  getMyAppointment,
 };
