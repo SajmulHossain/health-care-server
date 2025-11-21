@@ -3,9 +3,7 @@ import sendResponse from "../../shared/sendResponse";
 import { PrescriptionService } from "./prescription.service";
 
 const createPrescription = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-  const data = await PrescriptionService.createPrescription();
+  const data = await PrescriptionService.createPrescription(req.user, req.body);
 
   sendResponse(res, {
     statusCode: 201,
