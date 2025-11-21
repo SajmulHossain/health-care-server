@@ -3,7 +3,7 @@ import sendResponse from "../../shared/sendResponse";
 import { ReviewService } from "./review.service";
 
 const createReview = catchAsync(async (req, res) => {
-  const data = await ReviewService.createReview();
+  const data = await ReviewService.createReview(req.user, req.body);
 
   sendResponse(res, {
     statusCode: 201,
