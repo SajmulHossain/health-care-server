@@ -47,6 +47,9 @@ const getAllDoctors = async (query: Record<string, string>) => {
     orderBy: {
       [sortBy]: sortOrder,
     },
+    include: {
+      reviews: true,
+    },
   });
 
   const total = await prisma.doctor.count({
@@ -84,6 +87,7 @@ const getSingleDoctor = async (id: string) => {
           specialities: true,
         },
       },
+      reviews: true
     },
   });
 

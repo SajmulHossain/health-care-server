@@ -8,3 +8,6 @@ const router = Router();
 router.post("", checkAuth(UserRole.DOCTOR), PrescriptionController.createPrescription);
 
 export const PrescriptionRoutes = router;
+
+// * 63.3 done
+// * 63.4 should be continue
