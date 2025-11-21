@@ -32,7 +32,24 @@ const createAppointment = catchAsync(async (req, res) => {
   });
 });
 
+const updateAppointmentStatus = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  const data = await AppointmentService.updateAppointmentStatus(
+    id,
+    status,
+    req.user
+  );
+
+  sendResponse(res, {
+    statusCode: 201,
+    message: "Appointment Created Successfully",
+    data,
+  });
+});
+
 export const AppointmentController = {
   createAppointment,
   getMyAppointment,
+  updateAppointmentStatus,
 };

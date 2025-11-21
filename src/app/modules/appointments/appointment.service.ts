@@ -4,7 +4,8 @@ import { stripe } from "../../utils/stripe";
 import ApiError from "../../shared/ApiError";
 import pick from "../../utils/pick";
 import getPaginationInfo from "../../utils/pagination&sorting";
-import { Prisma, UserRole } from "@prisma/client";
+import { AppointmentStatus, Prisma, UserRole } from "@prisma/client";
+import { JwtPayload } from "jsonwebtoken";
 
 const createAppointment = async (
   email: string,
@@ -109,8 +110,7 @@ const getMyAppointment = async (
   query: Record<string, string>
 ) => {
   const options = pick(query, ["page", "limit", "sortBy", "sortOrder"]);
-  const filters = pick(query, ["status", "paymentStatus"]);
-  console.log(filters);
+  const { ...filters } = pick(query, ["status", "paymentStatus"]);
 
   const { limit: take, page, sortBy, sortOrder } = getPaginationInfo(options);
 
@@ -174,7 +174,38 @@ const getMyAppointment = async (
   };
 };
 
+const updateAppointmentStatus = async (
+  id: string,
+  status: AppointmentStatus,
+  user: JwtPayload
+) => {
+  const appointmentData = await prisma.appointment.findFirstOrThrow({
+    where: {
+      id,
+    },
+    include: {
+      doctor: true,
+    },
+  });
+
+  if (user.role === UserRole.DOCTOR) {
+    if (user.email !== appointmentData.doctor.email) {
+      throw new ApiError(400, "This is not your appointment!");
+    }
+  }
+
+  return await prisma.appointment.update({
+    where: {
+      id: appointmentData.id,
+    },
+    data: {
+      status,
+    },
+  });
+};
+
 export const AppointmentService = {
   createAppointment,
   getMyAppointment,
+  updateAppointmentStatus,
 };
