@@ -62,5 +62,5 @@ const refreshToken = async (payload: string) => {
 };
 
 export const AuthServices = {
-  login,
+  login, refreshToken
 };

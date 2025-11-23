@@ -26,6 +26,25 @@ const login = catchAsync(async (req, res) => {
   });
 });
 
+const refreshToken = catchAsync(async (req, res) => {
+  const { accessToken, needPasswordChange } = await AuthServices.refreshToken(
+    req.cookies.refreshToken
+  );
+
+  res.cookie("accessToken", accessToken, {
+    maxAge: 1000 * 60 * 60,
+    secure: true,
+    sameSite: "none",
+    httpOnly: true,
+  });
+
+  sendResponse(res, {
+    data: { needPasswordChange },
+    statusCode: 200,
+    message: "Access Token Created Successfully",
+  });
+});
+
 export const AuthControllers = {
   login,
 };
