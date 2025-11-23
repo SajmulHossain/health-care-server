@@ -45,6 +45,18 @@ const refreshToken = catchAsync(async (req, res) => {
   });
 });
 
+const getMe = catchAsync(async (req, res) => {
+  const data = await AuthServices.getMe(req.user);
+
+  sendResponse(res, {
+    statusCode: 200,
+    message: "User retrived successfully",
+    data,
+  });
+});
+
 export const AuthControllers = {
-  login, refreshToken
+  login,
+  refreshToken,
+  getMe
 };

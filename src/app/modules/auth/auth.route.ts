@@ -5,8 +5,8 @@ import { UserRole } from "@prisma/client";
 
 const router = Router();
 
-router.get("/me", checkAuth(...Object.values(UserRole)))
-router.post('/login', AuthControllers.login);
+router.get("/me", checkAuth(...Object.values(UserRole)), AuthControllers.getMe);
+router.post("/login", AuthControllers.login);
 router.post("/refresh-token", AuthControllers.refreshToken);
 
 export const AuthRoutes = router;
