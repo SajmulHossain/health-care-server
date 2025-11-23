@@ -46,5 +46,5 @@ const refreshToken = catchAsync(async (req, res) => {
 });
 
 export const AuthControllers = {
-  login,
+  login, refreshToken
 };
