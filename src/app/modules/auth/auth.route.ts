@@ -8,5 +8,10 @@ const router = Router();
 router.get("/me", checkAuth(...Object.values(UserRole)), AuthControllers.getMe);
 router.post("/login", AuthControllers.login);
 router.post("/refresh-token", AuthControllers.refreshToken);
+router.patch(
+  "/change-password",
+  checkAuth(...Object.values(UserRole)),
+  AuthControllers.changePassword
+);
 
 export const AuthRoutes = router;

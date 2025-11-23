@@ -1,5 +1,5 @@
 import { UserRole, UserStatus } from "@prisma/client";
-import { compare } from "bcryptjs";
+import { compare, hash } from "bcryptjs";
 import ApiError from "../../shared/ApiError";
 import { prisma } from "../../shared/prisma";
 import { token } from "../../utils/jwt";
@@ -78,12 +78,42 @@ const getMe = async (user: JwtPayload) => {
         : {},
   });
 
-
   return data;
+};
+
+const changePassword = async (email: string, payload: {oldPassword: string, newPassword: string}) => {
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+  const isCorrectPassword = await compare(payload.oldPassword, user.password);
+
+  if (!isCorrectPassword) {
+    throw new ApiError(400, "Wrong Password");
+  }
+
+  const hashedPassword = await hash(payload.newPassword, 10);
+
+  await prisma.user.update({
+    where: {
+      email,
+      status: UserStatus.ACTIVE,
+    },
+    data: {
+      password: hashedPassword,
+      needPasswordChange: false,
+    },
+  });
+
+  return;
 };
 
 export const AuthServices = {
   login,
   refreshToken,
-  getMe
+  getMe,
+  changePassword,
 };
