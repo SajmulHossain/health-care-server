@@ -1,8 +1,9 @@
-import { UserStatus } from "@prisma/client";
+import { UserRole, UserStatus } from "@prisma/client";
 import { compare } from "bcryptjs";
 import ApiError from "../../shared/ApiError";
 import { prisma } from "../../shared/prisma";
 import { token } from "../../utils/jwt";
+import { JwtPayload } from "jsonwebtoken";
 
 const login = async (payload: { email: string; password: string }) => {
   const user = await prisma.user.findUniqueOrThrow({
@@ -61,6 +62,28 @@ const refreshToken = async (payload: string) => {
   };
 };
 
+const getMe = async (user: JwtPayload) => {
+  const data = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user.email,
+      status: UserStatus.ACTIVE,
+    },
+    include:
+      user.role === UserRole.PATIENT
+        ? { patient: true }
+        : user.role === UserRole.DOCTOR
+        ? { doctor: true }
+        : user.role === UserRole.ADMIN
+        ? { admin: true }
+        : {},
+  });
+
+
+  return data;
+};
+
 export const AuthServices = {
-  login, refreshToken
+  login,
+  refreshToken,
+  getMe
 };
