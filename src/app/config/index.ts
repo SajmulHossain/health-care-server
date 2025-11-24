@@ -15,4 +15,11 @@ export default {
   open_router_api_key: process.env.OPEN_ROUTER_API_KEY,
   stripe_secrete_key: process.env.STRIPE_SECRETE_KEY,
   web_hook_secret: process.env.WEB_HOOK_SECRET,
+  email_sender: {
+    smtp_host: process.env.SMTP_HOST,
+    smtp_port: process.env.SMTP_PORT,
+    smtp_pass: process.env.SMTP_PASS,
+    smtp_user: process.env.SMTP_USER,
+    smtp_from: process.env.SMTP_FROM,
+  },
 };
