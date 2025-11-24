@@ -21,7 +21,7 @@ export const sendEmail = async ({
   html: string;
 }) => {
   const info = await transporter.sendMail({
-    from: '"Maddison Foo Koch" <maddison53@ethereal.email>',
+    from: config.email_sender.smtp_from,
     to,
     subject,
     html,

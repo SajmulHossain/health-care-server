@@ -4,6 +4,9 @@ import ApiError from "../../shared/ApiError";
 import { prisma } from "../../shared/prisma";
 import { token } from "../../utils/jwt";
 import { JwtPayload } from "jsonwebtoken";
+import config from "../../config";
+import { getForgotPasswordHtml } from "./auth.constant";
+import { sendEmail } from "../../utils/sendEmail";
 
 const login = async (payload: { email: string; password: string }) => {
   const user = await prisma.user.findUniqueOrThrow({
@@ -81,7 +84,10 @@ const getMe = async (user: JwtPayload) => {
   return data;
 };
 
-const changePassword = async (email: string, payload: {oldPassword: string, newPassword: string}) => {
+const changePassword = async (
+  email: string,
+  payload: { oldPassword: string; newPassword: string }
+) => {
   const user = await prisma.user.findUniqueOrThrow({
     where: {
       email,
@@ -111,9 +117,29 @@ const changePassword = async (email: string, payload: {oldPassword: string, newP
   return;
 };
 
+const forgotPassword = async (email: string) => {
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+  const forgetToken = token.createToken({
+    email: user.email,
+    role: user.role,
+  }, "forgot", "5m");
+
+  const html = getForgotPasswordHtml(forgetToken);
+  
+  sendEmail({to: user.email, html, subject: "Forgot Password"});
+  return;
+};
+
 export const AuthServices = {
   login,
   refreshToken,
   getMe,
   changePassword,
+  forgotPassword
 };

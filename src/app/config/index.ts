@@ -22,4 +22,5 @@ export default {
     smtp_user: process.env.SMTP_USER,
     smtp_from: process.env.SMTP_FROM,
   },
+  frontend_url: process.env.FRONTEND_URL,
 };
