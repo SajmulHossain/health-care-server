@@ -23,4 +23,11 @@ export default {
     smtp_from: process.env.SMTP_FROM,
   },
   frontend_url: process.env.FRONTEND_URL,
+  token: {
+    access_token_secret: process.env.ACCESS_TOKEN_SECRET,
+    refresh_token_secret: process.env.REFRESH_TOKEN_SECRET,
+    access_token_expire: process.env.ACCESS_TOKEN_EXPIRE,
+    refresh_token_expire: process.env.REFRESH_TOKEN_EXPIRE,
+    forgot_password_secret: process.env.FORGOT_PASSWORD_SECRET,
+  },
 };

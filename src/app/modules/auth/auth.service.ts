@@ -3,7 +3,7 @@ import { compare, hash } from "bcryptjs";
 import ApiError from "../../shared/ApiError";
 import { prisma } from "../../shared/prisma";
 import { token } from "../../utils/jwt";
-import { JwtPayload } from "jsonwebtoken";
+import { JwtPayload, Secret } from "jsonwebtoken";
 import config from "../../config";
 import { getForgotPasswordHtml } from "./auth.constant";
 import { sendEmail } from "../../utils/sendEmail";
@@ -24,13 +24,13 @@ const login = async (payload: { email: string; password: string }) => {
 
   const accessToken = token.createToken(
     { email: user.email, role: user.role },
-    "abcd",
-    "1h"
+    config.token.access_token_secret as Secret,
+    config.token.access_token_expire as string
   );
   const refreshToken = token.createToken(
     { email: user.email, role: user.role },
-    "abcd",
-    "2d"
+    config.token.refresh_token_secret as Secret,
+    config.token.refresh_token_expire as string
   );
 
   return {
@@ -55,8 +55,8 @@ const refreshToken = async (payload: string) => {
       email: user.email,
       role: user.role,
     },
-    "abcd",
-    "1h"
+    config.token.access_token_secret as Secret,
+    config.token.access_token_expire as string
   );
 
   return {
@@ -128,7 +128,7 @@ const forgotPassword = async (email: string) => {
   const forgetToken = token.createToken({
     email: user.email,
     role: user.role,
-  }, "forgot", "5m");
+  }, config.token.forgot_password_secret as Secret, "5m");
 
   const html = getForgotPasswordHtml(forgetToken);
   
